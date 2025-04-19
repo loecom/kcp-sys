@@ -1,5 +1,6 @@
 use std::env;
 use std::path::{Path, PathBuf};
+use std::fs;
 
 fn main() {
     println!("cargo:rustc-link-lib=kcp");
@@ -34,4 +35,9 @@ fn main() {
     bindings
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Couldn't write bindings!");
+        // 修复生成的 bindings.rs
+    let bindings_path = out_path.join("bindings.rs");
+    let bindings = fs::read_to_string(&bindings_path).unwrap();
+    let fixed_bindings = bindings.replace("unsafe extern \"C\" {", "extern \"C\" {");
+    fs::write(&bindings_path, fixed_bindings).unwrap();
 }
